@@ -4,7 +4,7 @@ Official documentation website for AS Framework - A modern, optimized FiveM serv
 
 ## 🌐 Live Documentation
 
-Visit [https://AScripts-Framework.github.io](https://AScripts-Framework.github.io/) to view the live documentation.
+Visit [https://YOUR_USERNAME.github.io/as-framework](https://YOUR_USERNAME.github.io/as-framework) to view the live documentation.
 
 ## 📚 What's Included
 
@@ -26,6 +26,20 @@ This documentation covers all AS Framework resources:
 - **Modern Design** - Clean purple theme matching the framework
 - **Fast Loading** - Static HTML/CSS/JS for instant page loads
 
+## 🛠️ Local Development
+
+To run the documentation locally:
+
+1. Clone this repository
+2. Open `index.html` in your web browser
+3. No build process required!
+
+```bash
+git clone https://github.com/YOUR_USERNAME/as-framework.git
+cd as-framework/docs
+# Open index.html in your browser
+```
+
 ## 📱 Mobile Friendly
 
 The documentation is fully optimized for mobile devices with:
@@ -35,9 +49,46 @@ The documentation is fully optimized for mobile devices with:
 - Responsive layouts and typography
 - Optimized spacing for small screens
 
+## 🎨 Customization
+
+### Changing Colors
+
+Edit the CSS variables in `style.css`:
+
+```css
+:root {
+    --purple: #8B5CF6;
+    --purple-dark: #7C3AED;
+    --purple-light: #A78BFA;
+}
+```
+
+### Adding New Content
+
+Update the documentation content in `script.js`:
+
+```javascript
+const docs = {
+    'resource-name': `
+    # Resource Name
+    Your markdown content here...
+    `
+}
+```
+
+## 📄 File Structure
+
+```
+docs/
+├── index.html          # Main HTML file
+├── style.css           # Styling and responsive design
+├── script.js           # Documentation content and functionality
+└── README.md           # This file
+```
+
 ## 🔗 Links
 
-- [Framework Repository](https://github.com/AScripts-Framework)
+- [Framework Repository](https://github.com/YOUR_USERNAME/as-framework)
 - [ox_lib Documentation](https://overextended.dev/ox_lib)
 - [FiveM Documentation](https://docs.fivem.net)
 

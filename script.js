@@ -778,6 +778,813 @@ exports['as-admin']:CloseAdminMenu()
 - as-core
 - oxmysql
 - ox_lib
+`,
+
+    'as-ambulance': `
+# AS-Ambulance
+
+**EMS/Ambulance Job System** - Complete emergency medical services with death mechanics, revive system, and hospital management.
+
+## Features
+
+- **💀 Death System** - Realistic death mechanics with last stand and timer
+- **🏥 Revive System** - EMS can revive downed players with roleplay animations
+- **🚑 Hospital Respawn** - Automatic hospital respawn when timer expires
+- **💊 Medical Items** - Bandages, medkits, and advanced medical supplies
+- **🎒 On-Duty Armory** - Medical supplies storage at hospital
+- **🚗 EMS Vehicles** - Ambulance vehicle spawning system
+- **💰 Payment System** - Get paid for reviving citizens
+- **📱 Dispatch Integration** - Receive emergency calls (with as-police)
+- **🎨 Modern UI** - Death screen with timer and visual effects
+
+## Installation
+
+1. Add **as-ambulance** to your resources folder
+2. Ensure **ox_inventory** is installed
+3. Add ambulance job items to ox_inventory (see items section)
+4. Add to **server.cfg**:
+
+\`\`\`cfg
+ensure as-core
+ensure ox_inventory
+ensure as-ambulance
+\`\`\`
+
+## Configuration
+
+Edit \`shared/config.lua\`:
+
+\`\`\`lua
+Config.Job = 'ambulance' -- Job name
+Config.MinimumEMSOnline = 0 -- Minimum EMS for auto-respawn
+Config.DeathTime = 300 -- Death timer in seconds (5 minutes)
+Config.LastStandTime = 30 -- Last stand timer in seconds
+Config.ReviveReward = 500 -- Money given to EMS for reviving
+
+Config.RespawnPoint = {
+    coords = vector3(311.0, -595.0, 43.3),
+    heading = 340.0
+}
+
+Config.Hospital = {
+    Armory = vector3(306.0, -601.0, 43.3),
+    VehicleSpawn = vector3(294.0, -574.0, 43.2),
+    VehicleHeading = 70.0
+}
+\`\`\`
+
+## ox_inventory Items
+
+Add to \`ox_inventory/data/items.lua\`:
+
+\`\`\`lua
+['bandage'] = {
+    label = 'Bandage',
+    weight = 50,
+    stack = true,
+    close = true,
+    description = 'Basic medical bandage'
+},
+
+['medkit'] = {
+    label = 'Medkit',
+    weight = 500,
+    stack = true,
+    close = true,
+    description = 'Advanced medical kit'
+}
+\`\`\`
+
+## How to Use
+
+### For EMS Players
+
+1. **Get the Job** - Be assigned the ambulance/EMS job
+2. **Access Armory** - Go to hospital armory point for medical supplies
+3. **Spawn Vehicle** - Use vehicle spawn point to get ambulance
+4. **Respond to Calls** - Check for downed players on map
+5. **Revive Players** - Approach downed player and use revive action
+
+### For Injured Players
+
+1. **Last Stand** - When health reaches 0, you enter last stand for 30 seconds
+2. **Death State** - After last stand expires, death screen appears
+3. **Wait for EMS** - EMS can revive you during death timer
+4. **Respawn** - Press E when timer expires to respawn at hospital
+
+## Events
+
+### Client Events
+
+\`\`\`lua
+-- Trigger death state
+TriggerEvent('as-ambulance:client:onPlayerDeath')
+
+-- Revive player
+TriggerEvent('as-ambulance:client:revive')
+
+-- Open armory
+TriggerEvent('as-ambulance:client:openArmory')
+\`\`\`
+
+### Server Events
+
+\`\`\`lua
+-- Revive player (server-side)
+TriggerEvent('as-ambulance:server:revivePlayer', targetId)
+\`\`\`
+
+## Exports
+
+### Client Exports
+
+\`\`\`lua
+-- Check if player is dead
+local isDead = exports['as-ambulance']:IsDead()
+
+-- Get last stand status
+local inLastStand = exports['as-ambulance']:IsInLastStand()
+
+-- Force revive player
+exports['as-ambulance']:RevivePlayer()
+\`\`\`
+
+## Commands
+
+\`\`\`
+/revive [id] - Revive a player (admin only)
+/kill [id] - Kill a player (admin only)
+/heal [id] - Heal a player (admin only)
+\`\`\`
+
+## Dependencies
+
+- as-core
+- ox_lib
+- ox_inventory
+`,
+
+    'as-police': `
+# AS-Police
+
+**Police Job System** - Comprehensive law enforcement system with MDT, evidence, armory, vehicles, warrants, and dispatch.
+
+## Features
+
+- **🖥️ MDT (Mobile Data Terminal)** - Complete police computer with search, warrants, evidence
+- **📋 Evidence System** - Collect, store, and manage crime scene evidence
+- **🔫 Armory System** - Weapon and equipment storage with rank restrictions
+- **🚓 Vehicle System** - Police vehicle spawning with garage management
+- **📜 Warrant System** - Create and manage arrest warrants
+- **🚨 Dispatch Alerts** - Receive 911 calls and crime alerts
+- **👮 Rank System** - Different ranks with varying permissions
+- **💰 Fine System** - Issue fines and manage payments
+- **🏢 Police Stations** - Multiple station support with different zones
+
+## Installation
+
+1. Add **as-police** to your resources folder
+2. Import **database.sql** to create police tables
+3. Ensure **ox_inventory** is installed
+4. Add police items to ox_inventory
+5. Add to **server.cfg**:
+
+\`\`\`cfg
+ensure as-core
+ensure ox_inventory
+ensure as-police
+\`\`\`
+
+## Database Tables
+
+The resource creates these tables:
+- **police_evidence** - Crime scene evidence storage
+- **police_warrants** - Active arrest warrants
+- **police_reports** - Incident reports
+- **police_convictions** - Criminal records
+
+## Configuration
+
+Edit \`shared/config.lua\`:
+
+\`\`\`lua
+Config.Job = 'police' -- Job name
+Config.MinimumPolice = 0 -- Minimum cops required
+
+Config.Stations = {
+    LSPD = {
+        label = 'Los Santos Police Department',
+        blip = vector3(425.1, -979.5, 30.7),
+        armory = vector3(452.6, -980.0, 30.7),
+        vehicles = vector3(438.4, -1018.3, 28.5),
+        mdt = vector3(441.0, -982.0, 30.7)
+    }
+}
+
+Config.Vehicles = {
+    {model = 'police', label = 'Police Cruiser', rank = 0},
+    {model = 'police2', label = 'Police Buffalo', rank = 2},
+    {model = 'policeb', label = 'Police Bike', rank = 1}
+}
+\`\`\`
+
+## MDT Features
+
+### Citizen Search
+- Search by name or state ID
+- View criminal history
+- See active warrants
+- Check convictions
+
+### Evidence Management
+- View all collected evidence
+- Filter by type, date, officer
+- Attach evidence to cases
+- Evidence photos and descriptions
+
+### Warrant System
+- Create new warrants
+- Search active warrants
+- Warrant types: Arrest, Search, Bench
+- Expiration dates
+
+### Reports
+- Create incident reports
+- Link evidence to reports
+- Officer notes and narratives
+- Case management
+
+## Dispatch Alerts
+
+Police receive alerts for:
+- **drugActivity** - Drug sales and production
+- **shooting** - Gunfire detected
+- **robbery** - Store robberies
+- **carjacking** - Vehicle theft
+- **speeding** - Excessive speeding
+- **vehicleTheft** - Stolen vehicles
+- **assault** - Physical altercations
+
+### Custom Alert Integration
+
+\`\`\`lua
+-- From any resource
+TriggerEvent('as-police:server:sendAlert', 'robbery', coords, 'Store robbery in progress', {
+    store = '24/7 Supermarket',
+    suspect = 'Armed'
+})
+\`\`\`
+
+## Armory System
+
+### Weapon Categories
+- **Pistols** - Rank 0+
+- **Shotguns** - Rank 1+
+- **Rifles** - Rank 2+
+- **Equipment** - Flashbangs, spike strips, etc.
+
+### Access Control
+\`\`\`lua
+Config.ArmoryItems = {
+    {item = 'weapon_pistol', label = 'Pistol', rank = 0},
+    {item = 'weapon_carbinerifle', label = 'Carbine', rank = 2},
+    {item = 'armor', label = 'Body Armor', rank = 0}
+}
+\`\`\`
+
+## Evidence System
+
+### Evidence Types
+- Fingerprints
+- DNA samples
+- Bullet casings
+- Photos
+- Documents
+- Physical evidence
+
+### Collecting Evidence
+
+\`\`\`lua
+-- Trigger evidence collection
+TriggerEvent('as-police:client:collectEvidence', evidenceType)
+\`\`\`
+
+## Commands
+
+\`\`\`
+/mdt - Open MDT (police only)
+/cuff - Cuff nearest player
+/escort - Escort cuffed player
+/drag - Drag cuffed player
+/jail [id] [time] - Send to jail
+/fine [id] [amount] - Issue fine
+/seize - Seize illegal items
+\`\`\`
+
+## Exports
+
+### Client Exports
+
+\`\`\`lua
+-- Check if player is police
+local isCop = exports['as-police']:IsPolice()
+
+-- Open MDT
+exports['as-police']:OpenMDT()
+
+-- Check if player is cuffed
+local isCuffed = exports['as-police']:IsCuffed()
+\`\`\`
+
+### Server Exports
+
+\`\`\`lua
+-- Send dispatch alert
+exports['as-police']:SendAlert(alertType, coords, message, data)
+
+-- Get online officers
+local officers = exports['as-police']:GetOnlineOfficers()
+\`\`\`
+
+## Integration with Other Resources
+
+The police system integrates with:
+- **as-drugs** - Receives drug activity alerts
+- **as-ambulance** - Can be called to medical scenes
+- **as-radio** - Police frequencies (100-199.9)
+
+## Dependencies
+
+- as-core
+- ox_lib
+- ox_inventory
+- oxmysql
+`,
+
+    'as-drugs': `
+# AS-Drugs
+
+**Drug Economy System** - Complete drug production, distribution, and consumption system with police integration.
+
+## Features
+
+- **🏭 Drug Labs** - Hidden labs for processing and crafting drugs
+- **💊 Drug Types** - Weed, cocaine, meth with unique effects
+- **🤝 Drug Dealers** - NPC dealers for buying/selling
+- **👤 Street Selling** - Sell to random NPCs on the street
+- **⚗️ Crafting System** - Process raw materials into sellable drugs
+- **🌿 Drug Effects** - Visual effects and stat changes when using
+- **🚨 Police Integration** - Alerts police when selling or crafting
+- **💰 Economy** - Dynamic pricing based on demand
+- **📊 Reputation** - Build reputation with dealers
+
+## Installation
+
+1. Add **as-drugs** to your resources folder
+2. Ensure **ox_inventory** and **as-police** are installed
+3. Add drug items to ox_inventory
+4. Add to **server.cfg**:
+
+\`\`\`cfg
+ensure as-core
+ensure ox_inventory
+ensure as-police  # Optional but recommended
+ensure as-drugs
+\`\`\`
+
+## Drug Types
+
+### Cannabis (Weed)
+- **Raw**: \`weed_leaf\`
+- **Processed**: \`weed_baggy\`
+- **Effects**: Relaxation, altered vision
+- **Base Price**: $50-80
+
+### Cocaine
+- **Raw**: \`coca_leaf\`
+- **Processed**: \`cocaine_baggy\`
+- **Effects**: Speed boost, stamina increase
+- **Base Price**: $150-200
+
+### Methamphetamine
+- **Raw**: \`ephedrine\`
+- **Processed**: \`meth_baggy\`
+- **Effects**: Extreme speed, aggression
+- **Base Price**: $250-350
+
+## Configuration
+
+Edit \`shared/config.lua\`:
+
+\`\`\`lua
+Config.PoliceCallChance = 30 -- % chance police called when selling
+Config.MinimumPolice = 0 -- Minimum cops required
+Config.SellTimeout = 5 -- Minutes between sells to same NPC
+
+Config.DrugLabs = {
+    {
+        coords = vector3(1005.0, -3200.0, -38.5),
+        name = 'Underground Lab',
+        drugs = {'weed', 'cocaine'}
+    }
+}
+
+Config.Dealers = {
+    {
+        coords = vector3(144.0, -1734.0, 29.3),
+        ped = 'a_m_y_mexthug_01',
+        drugs = {'weed_leaf', 'coca_leaf'}
+    }
+}
+\`\`\`
+
+## ox_inventory Items
+
+Add to \`ox_inventory/data/items.lua\`:
+
+\`\`\`lua
+-- Raw materials
+['weed_leaf'] = {
+    label = 'Cannabis Leaf',
+    weight = 100,
+    stack = true,
+    close = true,
+    description = 'Raw cannabis plant material'
+},
+
+-- Processed drugs
+['weed_baggy'] = {
+    label = 'Weed Baggy',
+    weight = 50,
+    stack = true,
+    close = true,
+    description = 'Packaged cannabis',
+    client = {
+        export = 'as-drugs.UseWeed'
+    }
+}
+\`\`\`
+
+## How to Use
+
+### Buying from Dealers
+1. Find a dealer on the map (blip)
+2. Approach the dealer NPC
+3. Use interaction (target/ox_target)
+4. Purchase raw materials
+
+### Processing Drugs
+1. Obtain raw materials
+2. Go to a drug lab location
+3. Use crafting menu
+4. Process materials into sellable drugs
+
+### Selling to NPCs
+1. Have processed drugs in inventory
+2. Approach random pedestrians
+3. Use sell action
+4. Complete the deal (or get rejected)
+
+### Using Drugs
+Use items from inventory to experience effects:
+- Visual screen effects
+- Stat modifications
+- Duration-based buffs/debuffs
+
+## Drug Effects
+
+### Weed Effects
+- Screen blur and color shift
+- Slight speed reduction
+- Relaxation animation
+- Duration: 60 seconds
+
+### Cocaine Effects
+- Increased movement speed (+20%)
+- Stamina boost
+- Screen shake
+- Duration: 90 seconds
+
+### Meth Effects
+- Major speed increase (+40%)
+- Aggression mode
+- Screen distortion
+- Duration: 120 seconds
+
+## Police Integration
+
+Drug activities trigger dispatch alerts:
+
+\`\`\`lua
+-- Automatic police notification
+- Drug sales to NPCs
+- Drug production at labs
+- Rejected sales (NPC calls police)
+\`\`\`
+
+Police see:
+- Alert type: "Drug Activity"
+- Location coordinates
+- Description of activity
+- Suspect information
+
+## Events
+
+### Client Events
+
+\`\`\`lua
+-- Start selling
+TriggerEvent('as-drugs:client:startSelling', drugType)
+
+-- Open lab crafting
+TriggerEvent('as-drugs:client:openLab')
+
+-- Use drug
+TriggerEvent('as-drugs:client:useDrug', drugType)
+\`\`\`
+
+### Server Events
+
+\`\`\`lua
+-- Process drug
+TriggerEvent('as-drugs:server:processDrug', drugType, amount)
+
+-- Complete sale
+TriggerEvent('as-drugs:server:completeSale', npcId, drugType, amount)
+\`\`\`
+
+## Exports
+
+### Client Exports
+
+\`\`\`lua
+-- Check if player is in drug lab
+local inLab = exports['as-drugs']:IsInDrugLab()
+
+-- Get current drug effects
+local effects = exports['as-drugs']:GetActiveDrugEffects()
+\`\`\`
+
+### Server Exports
+
+\`\`\`lua
+-- Add drug to economy
+exports['as-drugs']:RegisterDrug(drugData)
+
+-- Get drug price
+local price = exports['as-drugs']:GetDrugPrice(drugType)
+\`\`\`
+
+## Reputation System
+
+- Build reputation by successful sales
+- Higher reputation = better prices
+- Unlock new dealers and labs
+- Reputation decreases if caught by police
+
+## Anti-Spam Protection
+
+- Cooldown between sells
+- Can't sell to same NPC twice
+- Detection radius to prevent farm-spam
+- Configurable timeouts
+
+## Dependencies
+
+- as-core
+- ox_lib
+- ox_inventory
+- as-police (optional, for dispatch)
+`,
+
+    'as-radio': `
+# AS-Radio
+
+**Radio Communication System** - Advanced radio with PMA Voice integration, restricted frequencies, and real-time user tracking.
+
+## Features
+
+- **🎙️ PMA Voice Integration** - Crystal-clear voice communication
+- **🔒 Restricted Frequencies** - Job-locked frequency ranges
+- **👥 Active Users List** - See who's on your frequency in real-time
+- **🎚️ Volume Control** - Independent radio volume adjustment
+- **⚡ Quick Access** - One-click common frequency buttons
+- **🎨 Modern UI** - Beautiful interface with animations
+- **📱 Inventory Integration** - Requires radio item from ox_inventory
+- **🔊 Sound Effects** - Radio click sounds and animations
+
+## Installation
+
+1. Add **as-radio** to your resources folder
+2. Ensure **pma-voice** and **ox_inventory** are installed
+3. Add radio item to ox_inventory
+4. Add to **server.cfg**:
+
+\`\`\`cfg
+ensure pma-voice
+ensure as-core
+ensure ox_inventory
+ensure as-radio
+\`\`\`
+
+## Frequency Ranges
+
+| Range | Jobs | Description |
+|-------|------|-------------|
+| **100.0 - 199.9** | Police, Sheriff | Law enforcement only |
+| **200.0 - 299.9** | Ambulance, EMS | Emergency medical |
+| **300.0 - 399.9** | Mechanic | Mechanic services |
+| **400.0 - 499.9** | Taxi | Taxi services |
+| **1.0 - 99.9** | Public | Open to everyone |
+
+## Configuration
+
+Edit \`shared/config.lua\`:
+
+\`\`\`lua
+Config.RadioItem = 'radio' -- ox_inventory item
+Config.RadioKey = 'Z' -- Key to open radio
+
+Config.RestrictedFrequencies = {
+    {min = 100.0, max = 199.9, jobs = {'police', 'sheriff'}},
+    {min = 200.0, max = 299.9, jobs = {'ambulance', 'ems'}},
+    {min = 300.0, max = 399.9, jobs = {'mechanic'}},
+    {min = 400.0, max = 499.9, jobs = {'taxi'}}
+}
+
+Config.Radio = {
+    defaultVolume = 50,
+    enableClicks = true,
+    enableAnimation = true
+}
+\`\`\`
+
+## ox_inventory Item
+
+Add to \`ox_inventory/data/items.lua\`:
+
+\`\`\`lua
+['radio'] = {
+    label = 'Radio',
+    weight = 220,
+    stack = false,
+    close = true,
+    description = 'Portable radio for communication',
+    client = {
+        export = 'as-radio.UseRadio'
+    }
+}
+\`\`\`
+
+## How to Use
+
+### Opening Radio
+- Press **Z** (default) to open radio
+- Must have radio item in inventory
+
+### Connecting to Frequency
+1. Enter frequency (1.0 - 999.9)
+2. Click **CONNECT** button
+3. Or use quick access buttons
+
+### Talking on Radio
+- Use **PMA Voice push-to-talk** key
+- All users on same frequency hear you
+- Click sounds when transmitting
+
+### Volume Control
+- Adjust slider (0-100%)
+- Independent from game volume
+- Real-time adjustment
+
+### Active Users
+- Center-right panel shows active users
+- Displays name and job
+- Auto-updates when users join/leave
+
+## UI Features
+
+### Main Interface
+- Large frequency display
+- Status indicator (online/offline)
+- Frequency input with validation
+- Quick access buttons
+- Volume slider
+- Connect/disconnect buttons
+
+### Active Users Panel
+- Real-time user list
+- User avatars (initials)
+- Name and job display
+- Center-right positioning
+- Auto-scroll for many users
+
+## Events
+
+### Client Events
+
+\`\`\`lua
+-- Open radio interface
+TriggerEvent('as-radio:client:openRadio')
+
+-- Leave current channel
+TriggerEvent('as-radio:client:leaveChannel')
+\`\`\`
+
+## Exports
+
+### Client Exports
+
+\`\`\`lua
+-- Check if radio is on
+local isOn = exports['as-radio']:IsRadioOn()
+
+-- Get current frequency
+local freq = exports['as-radio']:GetRadioChannel()
+
+-- Force leave radio
+exports['as-radio']:LeaveRadio()
+\`\`\`
+
+### Server Exports
+
+\`\`\`lua
+-- Get users on frequency
+local users = exports['as-radio']:GetChannelUsers(frequency)
+-- Returns: {{id, name, job}, ...}
+\`\`\`
+
+## PMA Voice Integration
+
+Automatic integration with PMA Voice:
+- \`setRadioChannel(frequency)\` - Join voice channel
+- \`setRadioVolume(volume)\` - Set voice volume
+- \`removePlayerFromRadio()\` - Leave channel
+
+## Animations
+
+When talking on radio:
+- Cellphone animation plays
+- Character holds hand to ear
+- Configurable in config
+
+## Sound Effects
+
+Radio click sounds:
+- On connect
+- On disconnect
+- On transmission (optional)
+- Volume adjustable
+
+## Job Restrictions
+
+Server-side validation:
+- Checks player job before allowing connection
+- Returns error if unauthorized
+- Configurable per frequency range
+
+## Automatic Cleanup
+
+- Players removed on disconnect
+- Channel cleanup on player drop
+- Radio state cleared on resource restart
+
+## Commands
+
+\`\`\`
+/radio - Open radio interface (if have item)
+\`\`\`
+
+## Keybinds
+
+Default keybinds (remappable):
+- **Z** - Open radio
+- **ESC** - Close radio
+- **PMA Voice PTT** - Talk on radio
+
+## Troubleshooting
+
+### Radio won't open
+- Ensure you have radio item
+- Check as-radio started after as-core
+- Verify keybind not conflicting
+
+### Can't connect to frequency
+- Check if frequency is restricted
+- Verify you have required job
+- Ensure frequency in valid range
+
+### Voice not working
+- Ensure PMA Voice is running
+- Check push-to-talk key is set
+- Verify pma-voice starts before as-radio
+
+## Dependencies
+
+- as-core
+- pma-voice
+- ox_lib
+- ox_inventory
 `
 };
 
