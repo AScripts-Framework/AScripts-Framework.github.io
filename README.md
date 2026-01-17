@@ -4,7 +4,7 @@ Official documentation website for AS Framework - A modern, optimized FiveM serv
 
 ## 🌐 Live Documentation
 
-Visit [https://ASscripts-Framework.github.io/as-framework](https://AScripts-Framework.github.io/as-framework) to view the live documentation.
+Visit [https://YOUR_USERNAME.github.io/as-framework](https://YOUR_USERNAME.github.io/as-framework) to view the live documentation.
 
 ## 📚 What's Included
 

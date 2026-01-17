@@ -1357,6 +1357,368 @@ local price = exports['as-drugs']:GetDrugPrice(drugType)
 - as-police (optional, for dispatch)
 `,
 
+    'as-loading': `
+# AS-Loading
+
+**AS Framework Loading Screen** - Modern video background loading screen with media player controls, track information, and FiveM integration.
+
+## Features
+
+- **🎬 Video Background** - Multiple WebM video playlist support with built-in audio
+- **🎵 Track Information** - Album artwork, song name, and artist display
+- **🎮 Media Controls** - Play/pause, previous/next video, time scrubber, volume control, mute
+- **📊 Loading Progress** - Real-time progress bar in bottom-right corner
+- **💬 Loading Messages** - Dynamic messages at bottom-center
+- **⚙️ Highly Configurable** - Centralized config.js with 9 configuration sections
+- **🖱️ Cursor Support** - Enable cursor during loading
+- **🔌 AS Framework Integration** - Auto-shutdown on player loaded event
+- **🎨 Modern Layout** - Controls bottom-left, progress bottom-right, messages bottom-center
+
+## Installation
+
+1. Add **as-loading** to your resources folder
+2. Add videos and album artwork to \`html/videos/\` folder
+3. Add to **server.cfg**:
+
+\`\`\`cfg
+loadscreen 'as-loading'
+ensure as-loading
+\`\`\`
+
+## File Structure
+
+\`\`\`
+as-loading/
+├── fxmanifest.lua
+├── client.lua
+├── html/
+│   ├── index.html
+│   ├── style.css
+│   ├── script.js
+│   ├── config.js
+│   └── videos/
+│       ├── background.webm
+│       ├── album1.jpg
+│       └── ...
+└── preview.html
+\`\`\`
+
+## Configuration
+
+All settings in \`html/config.js\`:
+
+### Branding
+\`\`\`javascript
+branding: {
+    serverName: 'YOUR SERVER NAME',
+    tagline: 'Your Server Tagline',
+    logoPath: 'logo.png',
+    showLogo: false, // Logo hidden by default
+}
+\`\`\`
+
+### Video Playlist
+\`\`\`javascript
+videos: {
+    playlist: [
+        {
+            url: 'videos/background1.webm',
+            artist: 'Artist Name',
+            song: 'Song Title',
+            album: 'videos/album1.jpg'
+        },
+        {
+            url: 'videos/background2.webm',
+            artist: 'Another Artist',
+            song: 'Another Song',
+            album: 'videos/album2.jpg'
+        },
+    ],
+    muted: false, // Use video's built-in audio
+    autoPlay: true,
+    loop: true,
+}
+\`\`\`
+
+### Audio Settings
+\`\`\`javascript
+audio: {
+    enabled: false, // Separate audio disabled (using video audio)
+    defaultVolume: 30, // 0-100
+}
+\`\`\`
+
+### Control Colors
+\`\`\`javascript
+controls: {
+    show: true,
+    colors: {
+        primary: '#8B5CF6',
+        secondary: '#10B981',
+    }
+}
+\`\`\`
+
+### Progress Messages
+\`\`\`javascript
+progress: {
+    show: true,
+    messages: [
+        'Connecting to server...',
+        'Loading game assets...',
+        'Preparing your experience...',
+        'Syncing with server...',
+        'Loading player data...',
+        'Almost ready...',
+        'Welcome to AS Framework!'
+    ],
+    colors: {
+        bar: '#8B5CF6',
+        fill: 'linear-gradient(90deg, #8B5CF6, #10B981)',
+    },
+    shimmer: true,
+}
+\`\`\`
+
+### Layout Positioning
+\`\`\`javascript
+layout: {
+    logoTopPosition: 15, // % from top
+    progressBottomPosition: 20, // px from bottom (bottom-right)
+    progressRightPosition: 20, // px from right
+    progressWidth: 300, // px
+    controlsBottomPosition: 30, // px from bottom (250px from left)
+}
+\`\`\`
+
+### Loading Behavior
+\`\`\`javascript
+behavior: {
+    maxLoadTime: 300000, // 5 minutes in milliseconds
+    shutdownDelay: 1000, // Delay before shutdown
+    simulateProgress: true, // Simulate loading progress
+}
+\`\`\`
+
+## Media Requirements
+
+### WebM Videos with Audio
+- **Format**: WebM (VP8/VP9 with Vorbis/Opus audio)
+- **Resolution**: 1920x1080 recommended
+- **Duration**: 2-5 minutes recommended
+- **File Size**: Keep under 50MB for fast loading
+- **Audio**: Include audio track in the video file
+
+**Convert video to WebM with audio:**
+\`\`\`bash
+ffmpeg -i input.mp4 -c:v libvpx-vp9 -b:v 2M -c:a libvorbis background.webm
+\`\`\`
+
+### Album Artwork
+- **Format**: JPG or PNG
+- **Size**: 500x500px recommended (displayed at 45x45px)
+- **File Size**: Keep under 200KB
+
+## Controls Guide
+
+| Control | Function |
+|---------|----------|
+| ▶️ Play/Pause | Toggle video/audio playback |
+| ⏪ Previous | Jump to previous video in playlist |
+| ⏩ Next | Jump to next video in playlist |
+| 🎚️ Time Slider | Scrub through current video timeline |
+| 🔊 Volume Icon | Toggle mute on/off |
+| 🎚️ Volume Slider | Adjust audio volume (0-100%) |
+
+## Layout
+
+- **Player Controls**: Bottom-left (250px from left, 30px from bottom)
+- **Track Info**: In player controls (album art, song, artist)
+- **Loading Progress**: Bottom-right corner (20px from edges, 300px wide)
+- **Loading Messages**: Bottom-center (10px from bottom)
+
+## AS Framework Integration
+
+### Client-Side Event Handling
+
+The loading screen listens for AS Framework player loaded events:
+
+\`\`\`lua
+-- client.lua
+RegisterNetEvent('AS:Client:OnPlayerLoaded', function()
+    Wait(1000)
+    ShutdownLoadingScreen()
+    ShutdownLoadingScreenNui()
+    SetNuiFocus(false, false)
+end)
+
+RegisterNetEvent('AS:Client:OnCharacterSelected', function()
+    Wait(1000)
+    ShutdownLoadingScreen()
+    ShutdownLoadingScreenNui()
+    SetNuiFocus(false, false)
+end)
+\`\`\`
+
+### Cursor Support
+
+Cursor is enabled during loading and disabled on shutdown:
+
+\`\`\`lua
+CreateThread(function()
+    Wait(1000)
+    SetNuiFocus(true, true)
+    SetNuiFocusKeepInput(false)
+end)
+\`\`\`
+
+### Timeout Fallback
+
+Automatically shuts down after 5 minutes if no event received:
+
+\`\`\`lua
+SetTimeout(300000, function() -- 5 minutes
+    ShutdownLoadingScreen()
+    ShutdownLoadingScreenNui()
+end)
+\`\`\`
+
+## Preview Mode
+
+Open \`preview.html\` in your browser to test the loading screen:
+
+- Animated gradient background (fallback when video isn't loaded)
+- All media controls functional (demo mode)
+- Loading progress simulation
+- Sample track information display
+
+**Note**: Update video path to \`html/videos/background.webm\` in preview.html.
+
+## Customization
+
+### Change Control Position
+
+Edit \`html/style.css\`:
+
+\`\`\`css
+.controls-container {
+    left: 250px; /* Distance from left edge */
+    bottom: 30px; /* Distance from bottom */
+}
+\`\`\`
+
+### Change Progress Position
+
+\`\`\`css
+.loading-container {
+    right: 20px; /* Distance from right */
+    bottom: 20px; /* Distance from bottom */
+    width: 300px; /* Width of container */
+}
+\`\`\`
+
+### Hide Track Information
+
+\`\`\`css
+.track-info {
+    display: none;
+}
+\`\`\`
+
+### Change Colors
+
+Edit \`config.js\`:
+
+\`\`\`javascript
+controls: {
+    colors: {
+        primary: '#YOUR_COLOR',
+        secondary: '#YOUR_COLOR',
+    }
+}
+\`\`\`
+
+## Hosting Media Files
+
+### Local Files (Current Setup)
+Files stored in resource folder:
+
+\`\`\`
+as-loading/html/videos/
+├── background1.webm
+├── background2.webm
+├── album1.jpg
+├── album2.jpg
+└── ...
+\`\`\`
+
+**Note**: Large files increase resource size and initial download time.
+
+### CDN Option (Faster Loading)
+
+1. Upload videos and album art to a CDN
+2. Update paths in \`config.js\`:
+
+\`\`\`javascript
+videos: {
+    playlist: [
+        {
+            url: 'https://your-cdn.com/background1.webm',
+            artist: 'Artist Name',
+            song: 'Song Title',
+            album: 'https://your-cdn.com/album1.jpg'
+        },
+    ],
+}
+\`\`\`
+
+3. Remove local files from \`fxmanifest.lua\`
+
+## Troubleshooting
+
+### Video not loading
+- Check file path is correct (\`html/videos/\` folder)
+- Ensure WebM format with audio track
+- Check browser console for errors (F12)
+- Verify video file exists and isn't corrupted
+
+### Audio not playing
+- Make sure \`videos.muted: false\` in config.js
+- Check volume isn't at 0
+- Ensure video has audio track
+
+### Track info not updating
+- Verify playlist uses object format with artist/song/album
+- Check album artwork paths are correct
+- Ensure images exist in videos folder
+
+### Controls not visible
+- Check z-index values (controls should be 10+)
+- Verify \`controls.show: true\` in config.js
+- Clear browser cache
+
+### Loading screen won't close
+- Ensure AS Framework is triggering events
+- Check client.lua event listeners
+- Verify \`loadscreen_manual_shutdown 'yes'\` in fxmanifest.lua
+
+## Performance Tips
+
+1. **Optimize video file size** - Smaller = faster loading
+2. **Use CDN** - Better delivery speeds for players
+3. **Compress assets** - Reduce file sizes without quality loss
+4. **Test on slow connections** - Ensure acceptable load times
+
+## Dependencies
+
+- AS Framework (for auto-shutdown events)
+- Modern web browser (HTML5 video support)
+
+---
+
+**Part of AS Framework** - See main framework documentation for integration details.
+`,
+
     'as-radio': `
 # AS-Radio
 
