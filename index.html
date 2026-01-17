@@ -15,7 +15,10 @@
                 <i class="fas fa-shield-halved"></i>
                 <span>AS Framework</span>
             </div>
-            <nav class="nav">
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav class="nav" id="mainNav">
                 <a href="#overview">Overview</a>
                 <a href="#installation">Installation</a>
                 <a href="#resources">Resources</a>
@@ -136,8 +139,41 @@
     <section id="resources" class="section">
         <div class="container">
             <h2>Framework Resources</h2>
+            
+            <!-- Mobile Resource Tabs -->
+            <div class="resource-tabs">
+                <button class="resource-tab active" data-resource="as-core">
+                    <i class="fas fa-cube"></i>
+                    <span>Core</span>
+                </button>
+                <button class="resource-tab" data-resource="as-spawn">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Spawn</span>
+                </button>
+                <button class="resource-tab" data-resource="as-target">
+                    <i class="fas fa-crosshairs"></i>
+                    <span>Target</span>
+                </button>
+                <button class="resource-tab" data-resource="as-hud">
+                    <i class="fas fa-desktop"></i>
+                    <span>HUD</span>
+                </button>
+                <button class="resource-tab" data-resource="as-fuel">
+                    <i class="fas fa-gas-pump"></i>
+                    <span>Fuel</span>
+                </button>
+                <button class="resource-tab" data-resource="as-anticheat">
+                    <i class="fas fa-shield-virus"></i>
+                    <span>AntiCheat</span>
+                </button>
+                <button class="resource-tab" data-resource="as-admin">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Admin</span>
+                </button>
+            </div>
+
             <div class="resources-container">
-                <!-- Sidebar -->
+                <!-- Sidebar (Desktop) -->
                 <aside class="sidebar">
                     <div class="sidebar-item active" data-resource="as-core">
                         <i class="fas fa-cube"></i>

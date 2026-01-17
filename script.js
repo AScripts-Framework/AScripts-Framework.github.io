@@ -857,10 +857,49 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load initial documentation
     loadDoc('as-core');
 
-    // Sidebar click events
+    // Mobile menu toggle
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const mainNav = document.getElementById('mainNav');
+    
+    if (mobileMenuToggle) {
+        mobileMenuToggle.addEventListener('click', () => {
+            mainNav.classList.toggle('active');
+            const icon = mobileMenuToggle.querySelector('i');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-times');
+        });
+    }
+
+    // Close mobile menu when clicking nav links
+    document.querySelectorAll('.nav a').forEach(link => {
+        link.addEventListener('click', () => {
+            mainNav.classList.remove('active');
+            const icon = mobileMenuToggle.querySelector('i');
+            icon.classList.add('fa-bars');
+            icon.classList.remove('fa-times');
+        });
+    });
+
+    // Sidebar click events (Desktop)
     document.querySelectorAll('.sidebar-item').forEach(item => {
         item.addEventListener('click', () => {
             loadDoc(item.dataset.resource);
+        });
+    });
+
+    // Resource tab click events (Mobile)
+    document.querySelectorAll('.resource-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            loadDoc(tab.dataset.resource);
+            
+            // Update active tab
+            document.querySelectorAll('.resource-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            // Scroll to content on mobile
+            if (window.innerWidth <= 968) {
+                document.getElementById('doc-content').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         });
     });
 
